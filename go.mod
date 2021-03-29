@@ -1,4 +1,4 @@
-module github.com/geberl/go-ping-vrf
+module github.com/geberl/go-ping-vrf/ping
 
 go 1.14
 
