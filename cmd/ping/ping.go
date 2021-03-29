@@ -7,17 +7,20 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/go-ping/ping"
+	"github.com/geberl/go-ping-vrf/ping"
 )
 
 var usage = `
 Usage:
 
-    ping [-c count] [-i interval] [-t timeout] [--privileged] host
+    ping [-c count] [-i interval] [-t timeout] [--privileged] [-src ip] [-if interface] host
 
 Examples:
 
-    # ping google continuously
+    # ping 10.0.0.2 using the interface vrf-priv1 with the ip 10.0.0.2 continuously
+    ping -src 10.0.0.3 -if vrf-priv1 --privileged 10.0.0.2
+
+	# ping google continuously
     ping www.google.com
 
     # ping google 5 times
@@ -42,6 +45,8 @@ func main() {
 	count := flag.Int("c", -1, "")
 	size := flag.Int("s", 16, "")
 	privileged := flag.Bool("privileged", false, "")
+	source := flag.String("src", "", "")
+	sourceInterface := flag.String("if", "", "")
 	flag.Usage = func() {
 		fmt.Print(usage)
 	}
@@ -54,6 +59,8 @@ func main() {
 
 	host := flag.Arg(0)
 	pinger, err := ping.NewPinger(host)
+	pinger.Source = *source
+	pinger.SourceInterface = *sourceInterface
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 		return
@@ -90,7 +97,7 @@ func main() {
 	pinger.Timeout = *timeout
 	pinger.SetPrivileged(*privileged)
 
-	fmt.Printf("PING %s (%s):\n", pinger.Addr(), pinger.IPAddr())
+	fmt.Printf("PING %s (%s) from %s (%s):\n", pinger.Addr(), pinger.IPAddr(), pinger.Source, pinger.SourceInterface)
 	err = pinger.Run()
 	if err != nil {
 		fmt.Printf("Failed to ping target host: %s", err)

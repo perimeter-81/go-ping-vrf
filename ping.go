@@ -176,6 +176,9 @@ type Pinger struct {
 	// Source is the source IP address
 	Source string
 
+	// SourceInterface is the source interface name
+	SourceInterface string
+
 	// Channel and mutex used to communicate when the Pinger should stop between goroutines.
 	done chan interface{}
 	lock sync.Mutex
@@ -371,7 +374,7 @@ func (p *Pinger) Privileged() bool {
 // done. If Count or Interval are not specified, it will run continuously until
 // it is interrupted.
 func (p *Pinger) Run() error {
-	var conn *icmp.PacketConn
+	var conn *PacketConn
 	var err error
 	if p.ipaddr == nil {
 		err = p.Resolve()
@@ -499,7 +502,7 @@ func (p *Pinger) Statistics() *Statistics {
 }
 
 func (p *Pinger) recvICMP(
-	conn *icmp.PacketConn,
+	conn *PacketConn,
 	recv chan<- *packet,
 	wg *sync.WaitGroup,
 ) error {
@@ -620,7 +623,7 @@ func (p *Pinger) processPacket(recv *packet) error {
 	return nil
 }
 
-func (p *Pinger) sendICMP(conn *icmp.PacketConn) error {
+func (p *Pinger) sendICMP(conn *PacketConn) error {
 	var typ icmp.Type
 	if p.ipv4 {
 		typ = ipv4.ICMPTypeEcho
@@ -683,8 +686,8 @@ func (p *Pinger) sendICMP(conn *icmp.PacketConn) error {
 	return nil
 }
 
-func (p *Pinger) listen(netProto string) (*icmp.PacketConn, error) {
-	conn, err := icmp.ListenPacket(netProto, p.Source)
+func (p *Pinger) listen(netProto string) (*PacketConn, error) {
+	conn, err := ListenPacket(netProto, p.Source, p.SourceInterface)
 	if err != nil {
 		p.Stop()
 		return nil, err
