@@ -1,6 +1,6 @@
 # go-ping-vrf
 
-*ICMP Ping library for Go, modified to allow for Virtual Routing and Forwarding in Linux*
+*The popular ICMP Ping library for Go, modified to work when using vrf (Virtual Routing and Forwarding) in Linux*
 
 Original: [https://github.com/go-ping/ping]()
 
