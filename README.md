@@ -10,6 +10,6 @@ Only Linux, only ICMP (meaning no UDP). Should work for IPv4 and IPv6.
 # build
 go build cmd/ping/ping.go
 
-# ping 10.0.0.2 using the interface vrf-priv1 with the ip 10.0.0.2 continuously
+# ping target 10.0.0.2 using the interface vrf-priv1 with the source ip 10.0.0.3 continuously
 ping -src 10.0.0.3 -if vrf-priv1 --privileged 10.0.0.2
 ```
